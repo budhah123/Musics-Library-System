@@ -23,7 +23,7 @@ export class MusicsController {
     return this.musicsService.create(dto);
   }
 
-  @UseGuards(JwtGuard)
+  // @UseGuards(JwtGuard)
   @Get('')
   async getAllMusics() {
     return await this.musicsService.findAll();
