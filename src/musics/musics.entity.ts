@@ -2,7 +2,7 @@ import { Column, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeor
 import { UUID } from 'typeorm/driver/mongodb/bson.typings.js';
 
 @Entity()
-export class Musics {
+export class Music {
   @PrimaryGeneratedColumn('uuid')
   id: number;
 
@@ -17,6 +17,9 @@ export class Musics {
 
   @Column({ default: 'https://example.com/default-music-url' })
   url: string;
+
+  @Column({ default: 'https://example.com/default-thumbnail-url.jpg' })
+  thumbnail: string; 
 
   @Column({ type: 'timestamp', default: () => 'Current_Timestamp' })
   createAt: Date;

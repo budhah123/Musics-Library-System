@@ -7,6 +7,7 @@ import { UsersModule } from './users/users.module';
 import { MusicsModule } from './musics/musics.module';
 import { SupabaseService } from './supabase/supabase.service';
 import { SupabaseModule } from './supabase/supabase.module';
+import { FirebaseModule } from './firebase/firebase.module';
 
 
 
@@ -15,7 +16,8 @@ import { SupabaseModule } from './supabase/supabase.module';
     AuthModule,
     UsersModule,
     MusicsModule,
-    SupabaseModule
+    SupabaseModule,
+    FirebaseModule
   ],
   controllers: [AppController],
   providers: [AppService],

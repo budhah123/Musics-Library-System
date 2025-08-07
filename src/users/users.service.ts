@@ -1,58 +1,59 @@
 import { Injectable } from '@nestjs/common';
-import { SupabaseService } from '../supabase/supabase.service';
+
 import { RegisterDTO } from './DTOs/Register.dto';
 import * as bcrypt from 'bcrypt';
+import { FirebaseService } from 'src/firebase/firebase.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly supabaseService: SupabaseService) {}
+  constructor( private readonly firebaseService: FirebaseService) {}
 
-  async Register(registerDTO: RegisterDTO){
-    const hashed = await bcrypt.hash(registerDTO.password, 10);
-    const { data, error } = await this.supabaseService.getClient()
-      .from('Users')
-      .insert([{ ...registerDTO, password: hashed }])
-      .select()
-      .single();
+async Register(registerDTO: RegisterDTO) {
+  const db = this.firebaseService.getFireStore();
 
-    if (error) {
-      throw new Error(error.message);
-    }
-    return data;
+  const hashedPassword = await bcrypt.hash(registerDTO.password, 10);
+
+  const userRef = db.collection('users').doc();
+  await userRef.set({
+    ...registerDTO,
+    password: hashedPassword, 
+  });
+
+  return { id: userRef.id, ...registerDTO };
+}
+
+
+  async findByEmail(email: string): Promise<any> {
+  const db = this.firebaseService.getFireStore();
+  const usersRef = db.collection('users');
+  const snapshot = await usersRef.where('email', '==', email).limit(1).get();
+
+  if (snapshot.empty) {
+    return null;
   }
 
-  async findByEmail(email: string){
-    const { data, error } = await this.supabaseService.getClient()
-      .from('Users')
-      .select('*')
-      .eq('email', email)
-      .single();
+  const doc = snapshot.docs[0];
+  const data = doc.data();
 
-    if (error && error.code !== 'PGRST116') { // PGRST116 means no rows found
-      throw new Error(error.message);
-    }
-    return data;
-  }
+  return {
+    id: doc.id,
+    ...data,
+  };
+}
 
-  async findAll(): Promise<any[]> {
-    const { data, error } = await this.supabaseService.getClient()
-      .from('Users')
-      .select('*');
-
-    if (error) {
-      throw new Error(error.message);
-    }
-    return data;
+  async findAll(){
+    const db = this.firebaseService.getFireStore();
+    const snapshot = await db.collection('users').get();
+    return snapshot.docs.map(doc => ({id:doc.id,...doc.data()}));
   }
 
   async deleteUser(id: string): Promise<void> {
-    const { error } = await this.supabaseService.getClient()
-      .from('Users')
-      .delete()
-      .eq('id', id);
-
-    if (error) {
+    const db = this.firebaseService.getFireStore();
+    const userRef = db.collection('users').doc(id);
+    try {
+      await userRef.delete();
+    } catch(error) {
       throw new Error(error.message);
     }
-  }
+}
 }

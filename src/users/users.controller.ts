@@ -18,13 +18,13 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagg
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
-  // @Post('register')
-  // @ApiOperation({ summary: 'Register a new user' })
-  // @ApiResponse({ status: 201, description: 'User registered successfully' })
-  // @ApiResponse({ status: 400, description: 'Validation failed' })
-  // async register(@Body() dto: RegisterDTO) {
-  //   return await this.userService.Register(dto);
-  // }
+  @Post('register')
+  @ApiOperation({ summary: 'Register a new user' })
+  @ApiResponse({ status: 201, description: 'User registered successfully' })
+  @ApiResponse({ status: 400, description: 'Validation failed' })
+  async register(@Body() dto: RegisterDTO) {
+    return await this.userService.Register(dto);
+  }
 
   @Get()
   @ApiOperation({ summary: 'Get all users' })
